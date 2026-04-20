@@ -32,6 +32,14 @@ function FindJobs() {
             const city = cities[Math.floor(Math.random() * cities.length)];
             const company = companies[Math.floor(Math.random() * companies.length)];
             
+            const platforms = [
+                { name: "LinkedIn", url: (r, c) => `https://www.linkedin.com/jobs/search/?keywords=${encodeURIComponent(r + " " + c)}` },
+                { name: "Naukri", url: (r, c) => `https://www.naukri.com/${r.toLowerCase().replace(/ /g, "-")}-jobs-in-${city.toLowerCase()}` },
+                { name: "Indeed", url: (r, c) => `https://in.indeed.com/jobs?q=${encodeURIComponent(r)}&l=${encodeURIComponent(city)}` },
+                { name: "Monster", url: (r, c) => `https://www.foundit.in/srp/results?query=${encodeURIComponent(r)}&locations=${encodeURIComponent(city)}` }
+            ];
+            const platform = platforms[i % platforms.length];
+            
             mockJobs.push({
                 id: `mock-${i}`,
                 title: role,
@@ -39,7 +47,8 @@ function FindJobs() {
                 company_logo: `https://logo.clearbit.com/${company.toLowerCase().replace(" ", "")}.com?size=100`,
                 category: cat,
                 candidate_required_location: city,
-                url: `https://www.linkedin.com/jobs/search/?keywords=${encodeURIComponent(role + " " + company)}`,
+                url: platform.url(role, company),
+                platform: platform.name,
                 isLocal: false,
                 hasExternalUrl: true,
                 isIndia: true
@@ -205,7 +214,7 @@ function FindJobs() {
                                         rel="noreferrer" 
                                         className="block w-full text-center bg-blue-600 text-white font-black py-4 px-10 rounded-2xl hover:bg-blue-700 transition shadow-lg shadow-blue-200 dark:shadow-none whitespace-nowrap"
                                     >
-                                        Apply on Official Website ↗
+                                        Apply on {job.platform || "Official Website"} ↗
                                     </a>
                                 </div>
                             </div>

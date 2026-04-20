@@ -28,8 +28,8 @@ const generateWithRetry = async (ai, modelList, prompt, pdfBase64, textContent =
                 
                 // If it's a quota/rate limit error, wait longer or skip if it's the last attempt
                 if (error.message?.includes('429') || error.message?.toLowerCase().includes('quota')) {
-                    console.warn(`[AI] Quota hit on ${modelName}. Waiting 5 seconds before retry...`);
-                    await new Promise(r => setTimeout(r, 5000));
+                    console.warn(`[AI] Quota hit on ${modelName}. Waiting 3 seconds before retry...`);
+                    await new Promise(r => setTimeout(r, 3000));
                 } else if (error.message?.includes('404')) {
                     break; // Skip to next model if 404
                 } else {

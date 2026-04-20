@@ -10,6 +10,19 @@ function AIAnalyzer() {
     const [generatingResume, setGeneratingResume] = useState(false);
     const [generatedResumeText, setGeneratedResumeText] = useState(null);
 
+    React.useEffect(() => {
+        let timer;
+        if (loading) {
+            timer = setTimeout(() => {
+                toast("AI is taking longer than usual... Please check your internet or wait 10 more seconds.", {
+                    icon: '⏳',
+                    duration: 5000
+                });
+            }, 15000);
+        }
+        return () => clearTimeout(timer);
+    }, [loading]);
+
     const analyzeResumeHandler = async () => {
         setLoading(true);
         try {
