@@ -1,4 +1,4 @@
-import { GoogleGenAI } from '@google/genai';
+import { GoogleGenerativeAI } from '@google/generative-ai';
 import { User } from '../models/userModel.js';
 import { Job } from '../models/jobModel.js';
 import fs from 'fs';
@@ -30,6 +30,7 @@ const generateWithRetry = async (ai, modelList, prompt, pdfBase64, textContent =
                 const response = await result.response;
                 return response;
             } catch (error) {
+                console.error(`[AI ERROR] ${modelName}:`, error.message || error);
                 lastError = error;
                 const errMsg = (error.message || JSON.stringify(error)).toLowerCase();
                 if ((errMsg.includes('503') || errMsg.includes('429') || errMsg.includes('overloaded')) && i < 2) {
@@ -73,7 +74,7 @@ export const analyzeResume = async (req, res) => {
             textContent = fs.readFileSync(resumePath, 'utf8');
         }
 
-        const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+        const ai = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
         const prompt = `
         You are an elite SDE Recruitment Specialist and ATS Performance Auditor. 
