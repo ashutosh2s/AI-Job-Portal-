@@ -1,13 +1,18 @@
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+import { toast } from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
 import { USER_API_END_POINT, APPLICATION_API_END_POINT } from '../utils/constant';
 
 function Profile() {
     const navigate = useNavigate();
+    const user = JSON.parse(localStorage.getItem('user') || '{}');
+    
     const [input, setInput] = useState({
-        fullname: "",
-        email: "",
-        bio: "",
-        skills: "",
+        fullname: user.fullname || "",
+        email: user.email || "",
+        bio: user.profile?.bio || "",
+        skills: user.profile?.skills?.join(", ") || "",
         file: null
     });
     const [appliedJobs, setAppliedJobs] = useState([]);
@@ -100,13 +105,13 @@ function Profile() {
                     <input type="file" onChange={fileHandler} className="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 transition" accept=".pdf,.doc,.docx,.txt" />
                     
                     {/* Display current resume if any */}
-                    {localStorage.getItem('user') && JSON.parse(localStorage.getItem('user')).profile?.resume && (
+                    {user.profile?.resume && (
                         <div className="mt-4 p-3 bg-white rounded-lg border border-blue-100 flex items-center justify-between">
                             <span className="text-xs font-bold text-gray-600 truncate max-w-[200px]">
-                                Current: {JSON.parse(localStorage.getItem('user')).profile.resume}
+                                Current: {user.profile.resume}
                             </span>
                             <a 
-                                href={`http://localhost:8000/uploads/${JSON.parse(localStorage.getItem('user')).profile.resume}`} 
+                                href={`http://localhost:8000/uploads/${user.profile.resume}`} 
                                 target="_blank" rel="noreferrer"
                                 className="text-xs font-black text-blue-600 hover:underline"
                             >

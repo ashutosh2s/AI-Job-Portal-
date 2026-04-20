@@ -55,6 +55,11 @@ function FindJobs() {
     const handleApply = async (e, job) => {
         if (job.isLocal && !job.hasExternalUrl) {
             e.preventDefault();
+            const user = localStorage.getItem('user');
+            if (!user) {
+                toast.error("Please login to apply for jobs!");
+                return;
+            }
             try {
                 const res = await axios.post(`${APPLICATION_API_END_POINT}/apply/${job.jobId}`, {}, {
                     withCredentials: true

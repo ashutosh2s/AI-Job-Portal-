@@ -12,7 +12,7 @@ export default function VerifyLogin() {
     const [otp, setOtp] = useState("");
     const [showOtp, setShowOtp] = useState(false);
     const [loading, setLoading] = useState(false);
-    const [countdown, setCountdown] = useState(60);
+    const [countdown, setCountdown] = useState(90);
 
     useEffect(() => {
         if (!email) {
@@ -32,7 +32,7 @@ export default function VerifyLogin() {
             const res = await axios.post(`${USER_API_END_POINT}/forgot-password`, { email }); 
             if (res.data.success) {
                 toast.success("OTP Resent!");
-                setCountdown(60);
+                setCountdown(90);
             }
         } catch (error) {
             toast.error("Failed to resend OTP");

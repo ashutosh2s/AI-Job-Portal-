@@ -73,7 +73,7 @@ export const analyzeResume = async (req, res) => {
             textContent = fs.readFileSync(resumePath, 'utf8');
         }
 
-        const ai = new GoogleGenAI(process.env.GEMINI_API_KEY);
+        const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 
         const prompt = `
         You are an elite SDE Recruitment Specialist and ATS Performance Auditor. 
@@ -148,7 +148,7 @@ export const generateResume = async (req, res) => {
             textContent = fs.readFileSync(resumePath, 'utf8');
         }
 
-        const ai = new GoogleGenAI(process.env.GEMINI_API_KEY);
+        const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 
         const prompt = `
         You are a premium Resume Architect specializing in SDE/FAANG-style professional resumes.

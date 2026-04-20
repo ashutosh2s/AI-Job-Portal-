@@ -11,7 +11,7 @@ export default function VerifyResetOtp() {
 
     const [otp, setOtp] = useState("");
     const [loading, setLoading] = useState(false);
-    const [countdown, setCountdown] = useState(60);
+    const [countdown, setCountdown] = useState(90);
 
     useEffect(() => {
         if (!email) {
@@ -53,7 +53,7 @@ export default function VerifyResetOtp() {
                 withCredentials: true
             });
             toast.success("OTP Resent!");
-            setCountdown(60);
+            setCountdown(90);
         } catch(e) {
             toast.error("Failed to resend OTP");
         }
