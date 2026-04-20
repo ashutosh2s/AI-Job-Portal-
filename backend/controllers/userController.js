@@ -15,10 +15,8 @@ export const register = async (req, res) => {
             return res.status(400).json({ message: 'This email does not appear to be valid. Please use a real email address.', success: false });
         }
 
-        const userExists = await User.findOne({ email });
-        if (userExists) {
-            return res.status(400).json({ message: "User already exists with this email.", success: false });
-        }
+        let user = await User.findOne({ email });
+        
         const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{6,}$/;
         if (!passwordRegex.test(password)) {
             return res.status(400).json({ message: "Password must be at least 6 characters long and include an uppercase, lowercase, number, and special character.", success: false });
@@ -26,31 +24,46 @@ export const register = async (req, res) => {
 
         const hashedPassword = await bcrypt.hash(password, 10);
         const otp = Math.floor(100000 + Math.random() * 900000).toString();
-        const otpExpires = Date.now() + 60 * 1000;
+        const otpExpires = Date.now() + 10 * 60 * 1000; // 10 minutes
 
-        const newUser = await User.create({
-            fullname,
-            email,
-            password: hashedPassword,
-            role,
-            verificationOTP: otp,
-            verificationOTPExpires: otpExpires,
-            isVerified: false
-        });
-        const message = `Welcome to the Job Portal! Your Email Verification OTP is ${otp}. It is valid for 60 seconds.`;
+        if (user) {
+            if (user.isVerified) {
+                return res.status(400).json({ message: "User already exists with this email.", success: false });
+            } else {
+                // Update existing unverified user
+                user.fullname = fullname;
+                user.password = hashedPassword;
+                user.role = role;
+                user.verificationOTP = otp;
+                user.verificationOTPExpires = otpExpires;
+                await user.save();
+            }
+        } else {
+            // Create new user
+            user = await User.create({
+                fullname,
+                email,
+                password: hashedPassword,
+                role,
+                verificationOTP: otp,
+                verificationOTPExpires: otpExpires,
+                isVerified: false
+            });
+        }
+
+        const message = `Welcome to the Job Portal! Your Email Verification OTP is ${otp}. It is valid for 10 minutes.`;
 
         try {
             await sendEmail({
-                email: newUser.email,
+                email: user.email,
                 subject: "Job Portal Email Verification OTP",
                 message,
             });
+            return res.status(201).json({ message: "Account created successfully. Please check your email for the verification OTP.", success: true });
         } catch (emailError) {
             console.log("Email sending failed:", emailError);
-            // We can still proceed but user won't get email. Ideally, they can request a new OTP later.
+            return res.status(500).json({ message: "Failed to send verification email. Please try again or check your email settings.", success: false });
         }
-
-        return res.status(201).json({ message: "Account created successfully. Please check your email for the verification OTP.", success: true });
     } catch (error) {
         console.log(error);
         return res.status(500).json({ message: "Server error", success: false });
@@ -86,10 +99,10 @@ export const login = async (req, res) => {
 
         const otp = Math.floor(100000 + Math.random() * 900000).toString();
         user.verificationOTP = otp;
-        user.verificationOTPExpires = Date.now() + 60 * 1000;
+        user.verificationOTPExpires = Date.now() + 10 * 60 * 1000; // 10 minutes
         await user.save();
 
-        const message = `Your Login Verification OTP is ${otp}. It is valid for 60 seconds.`;
+        const message = `Your Login Verification OTP is ${otp}. It is valid for 10 minutes.`;
 
         try {
             await sendEmail({
@@ -326,7 +339,8 @@ export const verifyLoginOTP = async (req, res) => {
 
         return res.status(200).cookie("token", token, {
             maxAge: 1 * 24 * 60 * 60 * 1000, // 1 day
-            httpsOnly: true,
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
             sameSite: 'strict'
         }).json({
             message: `Welcome back ${user.fullname}!`,
