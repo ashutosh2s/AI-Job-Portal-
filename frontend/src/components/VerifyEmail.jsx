@@ -3,6 +3,8 @@ import axios from 'axios';
 import { toast } from 'react-hot-toast';
 import { useNavigate, useLocation } from 'react-router-dom';
 
+import { USER_API_END_POINT } from '../utils/constant';
+
 export default function VerifyEmail() {
     const navigate = useNavigate();
     const location = useLocation();
@@ -22,7 +24,7 @@ export default function VerifyEmail() {
 
         setLoading(true);
         try {
-            const res = await axios.post("https://ai-job-portal-glq9.onrender.com/api/v1/user/verify-email", { email, otp }, {
+            const res = await axios.post(`${USER_API_END_POINT}/verify-email`, { email, otp }, {
                 headers: { "Content-Type": "application/json" },
                 withCredentials: true
             });
