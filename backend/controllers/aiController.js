@@ -152,19 +152,29 @@ export const generateResume = async (req, res) => {
         const ai = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
         const prompt = `
-        You are a premium Resume Architect specializing in SDE/FAANG-style professional resumes.
-        Analyze the attached candidate's resume carefully.
+        You are a FAANG-level Senior Resume Engineer. 
+        Your goal is to transform the provided resume data into a HIGH-CONVERTING, PREMIUM SDE RESUME.
         
-        Generate a new, significantly improved version of this resume.
-        REQUIREMENTS:
-        - Use extremely professional, action-oriented Software Engineering language.
-        - Quantify achievements (e.g., "Improved latency by 20% using Redis caching").
-        - Ensure perfect ATS-friendly structure.
-        - Format the output using clean, professional Markdown.
-        - Include sections: Contact Info, Professional Summary, Core Tech Stack, Professional Experience, Projects, and Education.
+        Context Recommendation: If the resume contains academic patterns (like GLA University specific formats), preserve the core strengths but elevate them to global tech standards.
         
-        OUTPUT:
-        Only the markdown text of the resume. No chat filler. No "Here is the resume".
+        STRICT GUIDELINES:
+        1. STRUCTURE: 
+           - [PHOTO PLACEHOLDER] at the top right.
+           - Professional Header (Name, Linktree, GitHub, LinkedIn).
+           - Executive Summary (Max 3 lines, tech-heavy).
+           - Technical Skills (Mastery-based categorization).
+           - Professional Experience (Bullet points MUST start with action verbs and include metrics/impact).
+           - Project Section (Link to GitHub, tech stack used, complexity explained).
+           - Education & Achievements.
+        2. VERBIAGE: 
+           - Use "Engineered", "Orchestrated", "Spearheaded" instead of "Worked on".
+           - Quantify EVERYTHING (e.g., "Reduced bundle size by 40%", "Optimized API response time by 200ms").
+        3. FORMAT: 
+           - Use clean Markdown with clear headings and proper spacing.
+           - Ensure the tone is extremely professional yet modern.
+        
+        OUTPUT: 
+        Only the Markdown content. Do not include any meta-talk or introductory greetings.
         `;
 
         const response = await generateWithRetry(ai, ['gemini-2.0-flash', 'gemini-flash-latest', 'gemini-pro-latest'], prompt, pdfBase64, textContent);

@@ -51,19 +51,68 @@ function AIAnalyzer() {
         
         try {
             const doc = new jsPDF();
-            doc.setFont("helvetica", "bold");
-            doc.setFontSize(20);
-            doc.text("AI Generated Professional Resume", 20, 20);
+            const pageWidth = doc.internal.pageSize.getWidth();
             
+            // Header Accent
+            doc.setFillColor(37, 99, 235); // Royal Blue
+            doc.rect(0, 0, pageWidth, 40, 'F');
+            
+            // Resume Title
+            doc.setTextColor(255, 255, 255);
+            doc.setFont("helvetica", "bold");
+            doc.setFontSize(24);
+            doc.text("CURRICULUM VITAE", 20, 25);
+            
+            // Subtitle
+            doc.setFontSize(10);
             doc.setFont("helvetica", "normal");
+            doc.text("AI OPTIMIZED BY JOBPORTAL", 20, 32);
+
+            // Photo Placeholder Section
+            doc.setFillColor(240, 240, 240);
+            doc.roundedRect(pageWidth - 50, 10, 30, 35, 3, 3, 'F');
+            doc.setTextColor(150, 150, 150);
+            doc.setFontSize(8);
+            doc.text("PLACE PHOTO", pageWidth - 46, 28);
+            
+            // Body Content
+            doc.setTextColor(33, 33, 33);
             doc.setFontSize(10);
             
-            // Basic line-by-line rendering for PDF
-            const lines = doc.splitTextToSize(generatedResumeText, 170);
-            doc.text(lines, 20, 35);
+            const lines = doc.splitTextToSize(generatedResumeText, pageWidth - 40);
+            let yPos = 55;
             
-            doc.save("career-optimized-resume.pdf");
-            toast.success("Resume downloaded successfully! 📄");
+            lines.forEach(line => {
+                // If it's a heading (starts with # or matches common section names)
+                const isHeading = line.startsWith('#') || line.toUpperCase() === line && line.length > 3;
+                
+                if (isHeading) {
+                    yPos += 5;
+                    doc.setFont("helvetica", "bold");
+                    doc.setTextColor(37, 99, 235);
+                    doc.setFontSize(12);
+                    doc.text(line.replace(/#/g, '').trim(), 20, yPos);
+                    yPos += 2;
+                    doc.setDrawColor(200, 200, 200);
+                    doc.line(20, yPos, pageWidth - 20, yPos);
+                    yPos += 6;
+                } else {
+                    doc.setFont("helvetica", "normal");
+                    doc.setTextColor(60, 60, 60);
+                    doc.setFontSize(10);
+                    doc.text(line, 20, yPos);
+                    yPos += 6;
+                }
+
+                // Page overflow handling
+                if (yPos > 280) {
+                    doc.addPage();
+                    yPos = 20;
+                }
+            });
+            
+            doc.save("ai-optimized-professional-resume.pdf");
+            toast.success("Premium Resume Downloaded! 📄✨");
         } catch (error) {
             console.error(error);
             toast.error("Failed to generate PDF.");
