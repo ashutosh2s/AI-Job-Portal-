@@ -3,6 +3,8 @@ import axios from 'axios';
 import { toast } from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
 
+import { USER_API_END_POINT } from '../utils/constant';
+
 export default function ForgotPassword() {
     const [email, setEmail] = useState("");
     const navigate = useNavigate();
@@ -14,7 +16,7 @@ export default function ForgotPassword() {
         if (isSubmitting.current) return;
         isSubmitting.current = true;
         try {
-            const res = await axios.post("https://ai-job-portal-glq9.onrender.com/api/v1/user/forgot-password", { email }, {
+            const res = await axios.post(`${USER_API_END_POINT}/forgot-password`, { email }, {
                 headers: { "Content-Type": "application/json" },
                 withCredentials: true
             });
