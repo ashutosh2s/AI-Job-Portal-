@@ -27,54 +27,62 @@ function Navbar() {
     };
 
     return (
-        <div className="bg-[var(--color-bg)] border-b border-[var(--color-border)] shadow-sm transition-colors">
-            <div className="flex items-center justify-between h-16 max-w-7xl mx-auto px-4">
-                <div>
-                    <h1 className="text-2xl font-black tracking-tight text-[var(--color-text)]">
+        <nav className="sticky top-0 z-50 w-full bg-white dark:bg-slate-900 border-b border-gray-100 dark:border-slate-800 transition-all shadow-sm">
+            <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
+                
+                {/* Logo Section */}
+                <Link to="/home" className="flex items-center gap-2 group">
+                    <div className="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center text-white font-black text-2xl shadow-lg group-hover:rotate-6 transition-transform">
+                        J
+                    </div>
+                    <span className="text-2xl font-black tracking-tighter text-gray-900 dark:text-white">
                         Job<span className="text-blue-600">Portal</span>
-                    </h1>
+                    </span>
+                </Link>
+
+                {/* Navigation Links */}
+                <div className="hidden md:flex items-center gap-10 font-bold text-[13px] text-gray-500 dark:text-gray-400">
+                    <Link to="/home" className="hover:text-blue-600 transition tracking-wide uppercase">Home</Link>
+                    <Link to="/find-jobs" className="hover:text-blue-600 transition tracking-wide uppercase">Find Jobs</Link>
+                    {user?.role === 'recruiter' && (
+                        <>
+                            <Link to="/post-job" className="hover:text-blue-600 transition tracking-wide uppercase">Post Jobs</Link>
+                            <Link to="/admin" className="hover:text-blue-600 transition tracking-wide uppercase">Admin Hub</Link>
+                        </>
+                    )}
+                    <Link to="/ai-analyzer" className="flex items-center gap-1.5 text-blue-600 hover:text-blue-700 transition tracking-wide uppercase">
+                        <span>AI Specialist</span>
+                        <span className="bg-orange-500 text-white text-[9px] px-1.5 py-0.5 rounded font-black">NEW</span>
+                    </Link>
                 </div>
 
-                <div className="flex items-center gap-6 font-semibold text-[var(--color-text-secondary)]">
+                {/* Action Buttons */}
+                <div className="flex items-center gap-4">
+                    <ThemeToggle />
                     {user ? (
-                        <>
-                            <Link to="/home" className="hover:text-blue-600 transition">Home</Link>
-                            {user.role === 'recruiter' && (
-                                <>
-                                    <Link to="/post-job" className="hover:text-blue-600 transition">Post Job</Link>
-                                    <Link to="/admin/jobs" className="hover:text-blue-600 transition">My Jobs</Link>
-                                </>
-                            )}
-                            {user.role === 'jobseeker' && (
-                                <Link to="/find-jobs" className="hover:text-blue-600 transition">Find Jobs</Link>
-                            )}
-                            <Link to="/profile" className="hover:text-blue-600 transition">Profile</Link>
-                            <Link to="/ai-analyzer" className="hover:text-purple-600 text-purple-700 transition">AI Tool ✨</Link>
-                            {user.role === 'admin' && (
-                                <Link to="/admin" className="hover:text-red-600 text-red-700 transition tracking-wide text-sm bg-red-100 px-3 py-1 rounded-full uppercase">Admin 👑</Link>
-                            )}
-                            
-                            <div className="flex items-center gap-3 ml-4">
-                                <ThemeToggle />
-                                <button onClick={logoutHandler} className="px-5 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition hover:shadow-lg font-bold">
-                                    Logout
-                                </button>
-                            </div>
-                        </>
-                    ) : (
-                        <div className="flex items-center gap-3 ml-4">
-                            <ThemeToggle />
-                            <Link to="/login" className="px-5 py-2 border-2 border-gray-200 rounded-lg hover:bg-gray-100 transition">
-                                Login
+                        <div className="flex items-center gap-4">
+                            <Link to="/profile" className="hidden sm:block text-xs font-black text-gray-400 uppercase tracking-widest hover:text-blue-600 transition">
+                                My Profile
                             </Link>
-                            <Link to="/" className="px-5 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition hover:shadow-lg">
-                                Signup
+                            <button 
+                                onClick={logoutHandler}
+                                className="bg-gray-50 dark:bg-slate-800 text-gray-700 dark:text-gray-200 font-bold px-6 py-2.5 rounded-xl border border-gray-200 dark:border-slate-700 hover:bg-red-50 hover:text-red-600 hover:border-red-200 transition text-sm shadow-sm"
+                            >
+                                Logout
+                            </button>
+                        </div>
+                    ) : (
+                        <div className="flex items-center gap-3">
+                            <Link to="/login" className="text-gray-500 hover:text-blue-600 font-bold text-sm px-4 py-2 transition">Login</Link>
+                            <Link to="/" className="bg-blue-600 text-white font-bold px-7 py-3 rounded-2xl hover:bg-blue-700 transition shadow-lg shadow-blue-200 dark:shadow-none text-sm tracking-tight">
+                                Register Now
                             </Link>
                         </div>
                     )}
                 </div>
+
             </div>
-        </div>
+        </nav>
     );
 }
 
