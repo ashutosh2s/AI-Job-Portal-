@@ -7,41 +7,50 @@ import mammoth from 'mammoth';
 
 const generateWithRetry = async (ai, modelList, prompt, pdfBase64, textContent = null) => {
     let lastError;
-    for (const modelName of modelList) {
-        for (let i = 0; i < 3; i++) {
-            try {
-                console.log(`[AI] Requesting model: ${modelName} (Attempt ${i + 1})`);
-                const genModel = ai.getGenerativeModel({ model: `models/${modelName}` }, { apiVersion: 'v1beta' });
-                
-                let contentParts = [prompt];
-                if (pdfBase64) {
-                    contentParts.push({
-                        inlineData: {
-                            data: pdfBase64,
-                            mimeType: 'application/pdf'
-                        }
-                    });
-                }
-                if (textContent) {
-                    contentParts.push(`Here is the extracted resume text: \n\n ${textContent}`);
-                }
+    const key = process.env.GEMINI_API_KEY;
 
+    // Phase 1: Try the explicitly provided high-performance models
+    for (const modelName of modelList) {
+        for (let i = 0; i < 2; i++) {
+            try {
+                console.log(`[AI] Attempting ${modelName}...`);
+                const genModel = ai.getGenerativeModel({ model: `models/${modelName}` }, { apiVersion: 'v1beta' });
+                const contentParts = [prompt];
+                if (pdfBase64) contentParts.push({ inlineData: { data: pdfBase64, mimeType: 'application/pdf' } });
+                if (textContent) contentParts.push(`Text Context: ${textContent}`);
+                
                 const result = await genModel.generateContent(contentParts);
                 const response = await result.response;
                 return response;
             } catch (error) {
-                console.error(`[AI ERROR] ${modelName}:`, error.message || error);
                 lastError = error;
-                const errMsg = (error.message || JSON.stringify(error)).toLowerCase();
-                if ((errMsg.includes('503') || errMsg.includes('429') || errMsg.includes('overloaded')) && i < 2) {
-                    const delay = 2000 * (i + 1);
-                    await new Promise(resolve => setTimeout(resolve, delay));
-                } else {
-                    break; 
-                }
+                console.error(`[AI FAIL] ${modelName}:`, error.message);
+                if (error.message?.includes('404')) break; // Skip to next model if 404
+                await new Promise(r => setTimeout(r, 1000));
             }
         }
     }
+
+    // Phase 2: Self-Healing / Permanent Fix. If all hardcoded models fail,
+    // fetch the actual list of available models from the user's account.
+    try {
+        console.log("[AI] Entering Self-Healing mode. Fetching account model list...");
+        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${key}`);
+        const data = await response.json();
+        const availableModels = data.models
+            ?.filter(m => m.supportedGenerationMethods.includes('generateContent'))
+            .map(m => m.name);
+
+        if (availableModels && availableModels.length > 0) {
+            console.log(`[AI] Self-Heal: trying ${availableModels[0]}`);
+            const genModel = ai.getGenerativeModel({ model: availableModels[0] }, { apiVersion: 'v1beta' });
+            const result = await genModel.generateContent([prompt, ...(pdfBase64 ? [{inlineData:{data:pdfBase64, mimeType:'application/pdf'}}] : []), ...(textContent ? [textContent] : [])]);
+            return await result.response;
+        }
+    } catch (e) {
+        console.error("[AI] Self-Heal failed:", e.message);
+    }
+
     throw lastError; 
 };
 
