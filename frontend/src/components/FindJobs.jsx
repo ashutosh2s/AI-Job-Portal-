@@ -27,8 +27,9 @@ function FindJobs() {
                             company_logo: "https://via.placeholder.com/100?text=Local",
                             category: job.jobType || "General",
                             candidate_required_location: job.location || "Remote",
-                            url: "#", // Local job doesn't have an external apply link yet
+                            url: job.externalUrl || "#",
                             isLocal: true,
+                            hasExternalUrl: !!job.externalUrl,
                             jobId: job._id
                         }));
                     }
@@ -52,7 +53,7 @@ function FindJobs() {
     );
 
     const handleApply = async (e, job) => {
-        if (job.isLocal) {
+        if (job.isLocal && !job.hasExternalUrl) {
             e.preventDefault();
             try {
                 const res = await axios.post(`${APPLICATION_API_END_POINT}/apply/${job.jobId}`, {}, {
@@ -113,12 +114,12 @@ function FindJobs() {
                             
                             <a 
                                 href={job.url} 
-                                target={job.isLocal ? "_self" : "_blank"} 
+                                target={(job.hasExternalUrl || !job.isLocal) ? "_blank" : "_self"} 
                                 rel="noreferrer" 
                                 onClick={(e) => handleApply(e, job)}
-                                className="block w-full text-center bg-gray-900 text-white font-bold py-3.5 rounded-xl hover:bg-blue-600 transition shadow-lg"
+                                className="block w-full text-center bg-[var(--color-text)] text-[var(--color-bg)] font-bold py-3.5 rounded-xl hover:opacity-90 transition shadow-lg"
                             >
-                                Apply Directly 🚀
+                                {(job.hasExternalUrl || !job.isLocal) ? "Apply via Company ✨" : "Quick Apply 🚀"}
                             </a>
                         </div>
                     )) : (

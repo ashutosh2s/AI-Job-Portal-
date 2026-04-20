@@ -92,9 +92,28 @@ function Profile() {
                     <input type="text" name="skills" value={input.skills} onChange={changeEventHandler} className="w-full border-2 border-gray-200 p-3 rounded-lg focus:border-blue-500 outline-none transition" placeholder="e.g. HTML, CSS, React" />
                 </div>
 
-                <div className="col-span-2 mt-2">
-                    <label className="block text-gray-700 font-bold mb-1">Upload Resume (PDF/DOC)</label>
-                    <input type="file" onChange={fileHandler} className="w-full border-2 border-gray-200 p-3 rounded-lg bg-gray-50 focus:border-blue-500 outline-none transition" accept="application/pdf,.doc,.docx" />
+                <div className="col-span-2 mt-2 p-6 bg-blue-50/50 rounded-xl border-2 border-dashed border-blue-200">
+                    <label className="block text-gray-700 font-black mb-2 flex items-center gap-2">
+                        <span>📤 Update Resume (PDF, DOCX, TXT)</span>
+                        {input.file && <span className="text-xs bg-green-500 text-white px-2 py-0.5 rounded-full animate-bounce">Selected!</span>}
+                    </label>
+                    <input type="file" onChange={fileHandler} className="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 transition" accept=".pdf,.doc,.docx,.txt" />
+                    
+                    {/* Display current resume if any */}
+                    {localStorage.getItem('user') && JSON.parse(localStorage.getItem('user')).profile?.resume && (
+                        <div className="mt-4 p-3 bg-white rounded-lg border border-blue-100 flex items-center justify-between">
+                            <span className="text-xs font-bold text-gray-600 truncate max-w-[200px]">
+                                Current: {JSON.parse(localStorage.getItem('user')).profile.resume}
+                            </span>
+                            <a 
+                                href={`http://localhost:8000/uploads/${JSON.parse(localStorage.getItem('user')).profile.resume}`} 
+                                target="_blank" rel="noreferrer"
+                                className="text-xs font-black text-blue-600 hover:underline"
+                            >
+                                View Live 📄
+                            </a>
+                        </div>
+                    )}
                 </div>
                 
                 <button type="submit" className="col-span-2 mt-6 w-full bg-blue-600 text-white font-black text-lg py-4 rounded-xl hover:bg-blue-700 transition transform hover:-translate-y-1 shadow-lg shadow-blue-500/30">

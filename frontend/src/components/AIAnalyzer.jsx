@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { toast } from 'react-hot-toast';
+import { jsPDF } from 'jspdf';
 import { USER_API_END_POINT } from '../utils/constant';
 
 function AIAnalyzer() {
@@ -45,6 +46,30 @@ function AIAnalyzer() {
         }
     };
 
+    const downloadResume = () => {
+        if (!generatedResumeText) return;
+        
+        try {
+            const doc = new jsPDF();
+            doc.setFont("helvetica", "bold");
+            doc.setFontSize(20);
+            doc.text("AI Generated Professional Resume", 20, 20);
+            
+            doc.setFont("helvetica", "normal");
+            doc.setFontSize(10);
+            
+            // Basic line-by-line rendering for PDF
+            const lines = doc.splitTextToSize(generatedResumeText, 170);
+            doc.text(lines, 20, 35);
+            
+            doc.save("career-optimized-resume.pdf");
+            toast.success("Resume downloaded successfully! 📄");
+        } catch (error) {
+            console.error(error);
+            toast.error("Failed to generate PDF.");
+        }
+    };
+
     return (
         <div className="min-h-screen bg-gray-50 p-6">
             <div className="max-w-4xl mx-auto space-y-8">
@@ -62,11 +87,18 @@ function AIAnalyzer() {
 
                 {result && (
                     <div className="grid md:grid-cols-2 gap-6">
-                        <div className="bg-white p-6 rounded-lg shadow-md border-t-4 border-blue-600">
-                            <h2 className="text-xl font-bold mb-4">Your AI Score 🎯</h2>
-                            <div className="flex items-center justify-center">
-                                <div className="text-5xl font-extrabold text-blue-600">{result.analysis.score}/100</div>
+                        <div className="bg-white p-8 rounded-2xl shadow-xl border-t-8 border-blue-600 transition-all hover:shadow-blue-100 flex flex-col items-center">
+                            <h2 className="text-xl font-black mb-6 text-gray-800 uppercase tracking-widest">ATS Match Score 🚀</h2>
+                            <div className="relative w-32 h-32 flex items-center justify-center">
+                                <svg className="w-full h-full transform -rotate-90">
+                                    <circle cx="64" cy="64" r="58" stroke="currentColor" strokeWidth="8" fill="transparent" className="text-gray-100" />
+                                    <circle cx="64" cy="64" r="58" stroke="currentColor" strokeWidth="8" fill="transparent" strokeDasharray="364.4" strokeDashoffset={364.4 - (364.4 * result.analysis.score) / 100} className={`${result.analysis.score >= 80 ? 'text-green-500' : result.analysis.score >= 50 ? 'text-yellow-500' : 'text-red-500'} transition-all duration-1000`} />
+                                </svg>
+                                <div className="absolute text-4xl font-black text-gray-900">{result.analysis.score} <span className="text-xs text-gray-400">%</span></div>
                             </div>
+                            <p className="mt-6 text-sm font-bold text-gray-500 text-center">
+                                {result.analysis.score >= 80 ? "SDE READY! (High FAANG Probability)" : result.analysis.score >= 50 ? "DECENT Match. Needs Optimization." : "POOR Match. Rewrite Required."}
+                            </p>
                         </div>
 
                         <div className="bg-white p-6 rounded-lg shadow-md border-t-4 border-red-500">
@@ -100,20 +132,35 @@ function AIAnalyzer() {
                         </div>
 
                         {generatedResumeText && (
-                           <div className="md:col-span-2 bg-slate-900 text-slate-50 p-6 rounded-lg shadow-md border-t-4 border-teal-500 overflow-x-auto">
-                                <h2 className="text-xl font-bold mb-4 text-teal-400">Your AI Generated Resume</h2>
-                                <button
-                                    onClick={() => {
-                                        navigator.clipboard.writeText(generatedResumeText);
-                                        toast.success("Resume Copied to Clipboard!");
-                                    }}
-                                    className="mb-4 bg-teal-600 hover:bg-teal-500 text-white py-1 px-4 rounded text-sm transition"
-                                >
-                                    Copy to Clipboard
-                                </button>
-                                <pre className="whitespace-pre-wrap font-mono text-sm leading-relaxed p-4 bg-slate-800 rounded border border-slate-700">
-                                    {generatedResumeText}
-                                </pre>
+                           <div className="md:col-span-2 bg-slate-900 text-slate-50 p-8 rounded-2xl shadow-2xl border-t-8 border-teal-500 overflow-x-auto relative group">
+                                <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
+                                    <div>
+                                        <h2 className="text-3xl font-black text-teal-400">Your AI Optimized Resume</h2>
+                                        <p className="text-slate-400 text-sm font-bold uppercase tracking-widest mt-1">SDE FAANG Standard Formatting</p>
+                                    </div>
+                                    <div className="flex gap-3">
+                                        <button
+                                            onClick={() => {
+                                                navigator.clipboard.writeText(generatedResumeText);
+                                                toast.success("Resume Copied to Clipboard!");
+                                            }}
+                                            className="bg-slate-700 hover:bg-slate-600 text-white font-bold py-2 px-6 rounded-xl transition shadow-lg border border-slate-600"
+                                        >
+                                            📋 Copy
+                                        </button>
+                                        <button
+                                            onClick={downloadResume}
+                                            className="bg-teal-600 hover:bg-teal-500 text-white font-bold py-2 px-6 rounded-xl transition shadow-lg flex items-center gap-2"
+                                        >
+                                            📥 Download PDF
+                                        </button>
+                                    </div>
+                                </div>
+                                <div className="bg-slate-800/50 p-8 rounded-xl border border-slate-700/50 backdrop-blur-sm">
+                                    <pre className="whitespace-pre-wrap font-mono text-sm leading-relaxed text-slate-200">
+                                        {generatedResumeText}
+                                    </pre>
+                                </div>
                            </div>
                         )}
 

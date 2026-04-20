@@ -15,6 +15,8 @@ import FindJobs from './components/FindJobs';
 import VerifyEmail from './components/VerifyEmail';
 import VerifyResetOtp from './components/VerifyResetOtp';
 import VerifyLogin from './components/VerifyLogin';
+import AdminJobs from './components/AdminJobs';
+import Applicants from './components/Applicants';
 
 import { ThemeProvider } from './context/ThemeContext';
 
@@ -37,6 +39,8 @@ function App() {
          <Route path="/reset-password" element={<ResetPassword />} />
          <Route path="/ai-analyzer" element={<AIAnalyzer />} />
          <Route path="/admin" element={<AdminDashboard />} />
+         <Route path="/admin/jobs" element={<AdminJobs />} />
+         <Route path="/admin/jobs/:id/applicants" element={<Applicants />} />
          <Route path="/find-jobs" element={<FindJobs />} />
          <Route path="/dashboard/recruiter" element={<Home />} />
          <Route path="/dashboard/jobseeker" element={<Home />} />

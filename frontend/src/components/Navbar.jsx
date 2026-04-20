@@ -40,11 +40,19 @@ function Navbar() {
                         <>
                             <Link to="/home" className="hover:text-blue-600 transition">Home</Link>
                             {user.role === 'recruiter' && (
-                                <Link to="/post-job" className="hover:text-blue-600 transition">Post Job</Link>
+                                <>
+                                    <Link to="/post-job" className="hover:text-blue-600 transition">Post Job</Link>
+                                    <Link to="/admin/jobs" className="hover:text-blue-600 transition">My Jobs</Link>
+                                </>
+                            )}
+                            {user.role === 'jobseeker' && (
+                                <Link to="/find-jobs" className="hover:text-blue-600 transition">Find Jobs</Link>
                             )}
                             <Link to="/profile" className="hover:text-blue-600 transition">Profile</Link>
                             <Link to="/ai-analyzer" className="hover:text-purple-600 text-purple-700 transition">AI Tool ✨</Link>
-                            <Link to="/admin" className="hover:text-red-600 text-red-700 transition tracking-wide text-sm bg-red-100 px-3 py-1 rounded-full uppercase">Admin 👑</Link>
+                            {user.role === 'admin' && (
+                                <Link to="/admin" className="hover:text-red-600 text-red-700 transition tracking-wide text-sm bg-red-100 px-3 py-1 rounded-full uppercase">Admin 👑</Link>
+                            )}
                             
                             <div className="flex items-center gap-3 ml-4">
                                 <ThemeToggle />
